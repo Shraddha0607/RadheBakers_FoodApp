@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useActionState } from 'react'
 import Modal from './UI/Modal'
 import CartContext from '../store/CartContext'
 import { currencyFormatter } from '../util/formatting';
@@ -21,7 +21,6 @@ function Checkout() {
 
     const { 
         data, 
-        isLoading: isSending, 
         error, 
         sendRequest,
         clearData
@@ -42,13 +41,10 @@ function Checkout() {
         clearData();
     }
 
-    function handleSubmit(event) {
-        event.preventDefault();
-
-        const formData = new FormData(event.target);
+    async function checkoutAction(prevState, formData) {
         const customerData = Object.fromEntries(formData.entries());
 
-        sendRequest(
+        await sendRequest(
             JSON.stringify({
                 order: {
                     items: cartCtx.items,
@@ -59,11 +55,12 @@ function Checkout() {
 
     }
 
+    const [formState, formAction, isSending] = useActionState(checkoutAction, null);
+
     let actions = (
         <>
             <Button type="button" textOnly onClick={handleClose}>Close</Button>
             <Button>Submit Order</Button>
-
         </>
     );
 
@@ -90,7 +87,7 @@ function Checkout() {
             open={userProgressCtx.progress === 'checkout'}
             onClose={handleClose}
         >
-            <form onSubmit={handleSubmit}>
+            <form action={formAction}>
                 <h2>Checkout</h2>
                 <p>Total Amount: {currencyFormatter.format(cartTotal)} </p>
 

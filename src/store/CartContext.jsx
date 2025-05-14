@@ -74,8 +74,6 @@ export function CartContextProvider({children}) {
         removeItem
     };
 
-    console.log(cartContext);
-
     return (
         // // after 19, <CartContext> is ok</CartContext>
         <CartContext.Provider value={cartContext}>   
